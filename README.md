@@ -20,19 +20,19 @@ Image Gallery built with symfony 4
 
 2. configuring the database
 
-		vim .env
+        vim .env
 
-		# .env (or override DATABASE_URL in .env.local to avoid committing your changes)
+        # .env (or override DATABASE_URL in .env.local to avoid committing your changes)
 
-		# customize this line!
-		DATABASE_URL="mysql://db_user:db_password@127.0.0.1:3306/db_name"
+        # customize this line!
+        DATABASE_URL="mysql://db_user:db_password@127.0.0.1:3306/db_name"
 
 3. create the db_name database and schema
 
         php bin/console doctrine:database:create
         php bin/console doctrine:migrations:migrate
 
-4. run php script as daemon using supervisord  
+4. run ResizeImageWorker as daemon using supervisord  
 
         see ./scripts/setup-supervisor.sh
 
