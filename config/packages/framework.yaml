@@ -1,0 +1,26 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+    #csrf_protection: true
+    #http_method_override: true
+
+    # Enables session support. Note that the session will ONLY be started if you read or write from it.
+    # Remove or comment this section to explicitly disable session support.
+    # https://symfony.com/doc/current/reference/configuration/framework.html#session
+    session:
+        #https://symfony.com/doc/current/doctrine/pdo_session_storage.html
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+        #handler_id: 'session.handler.native_file'
+        #save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+        #cookie_secure: auto #type: boolean or string default: false
+        #cookie_samesite: lax #type: string or null default: null
+        #cookie_lifetime: 0 #Setting this value to 0 means the cookie is valid for the length of the browser session.
+        cookie_httponly: true #type: boolean default: true
+        gc_maxlifetime: 3600 #type: integer default: 1440
+        gc_probability: 1 #type: integer default: 1
+        gc_divisor: 100 #type: integer default: 100
+
+
+    #esi: true
+    #fragments: true
+    php_errors:
+        log: true

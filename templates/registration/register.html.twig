@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    
+    <style>
+        .form-check-input {
+            position: absolute;
+            margin-top: .25rem;
+            margin-left: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% if not app.user %}
+
+            <h1>Registration</h1>
+
+            {{ form_start(registrationForm) }}
+                {{ form_row(registrationForm.email) }}
+    	        {{ form_row(registrationForm.plainPassword) }}
+    	        {{ form_row(registrationForm.agreeTerms) }}
+
+                <button type="submit" class="btn btn-primary">
+                    Submit
+                </button>
+
+            {{ form_end(registrationForm) }}
+
+        {% else %}
+        
+            You have registered as <b>{{ app.user.email }}</b>, <a href="{{ path('app_logout') }}">Logout</a>
+
+        {% endif %}
+
+
+    </div>
+
+{% endblock %}
