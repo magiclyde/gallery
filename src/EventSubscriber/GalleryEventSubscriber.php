@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Service;
+namespace App\EventSubscriber;
 
 use App\Entity\Gallery;
 use App\Entity\Image;
 use App\Event\GalleryCreatedEvent;
+use App\Service\JobQueueFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
