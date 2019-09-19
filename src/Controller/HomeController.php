@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Gallery;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,12 +14,23 @@ class HomeController extends AbstractController
 {
     const PER_PAGE = 12;
 
+    /** @var EntityManagerInterface */
+    private $em;
+
+    /** @var  UserManager */
+    private $userManager;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
+
     /**
      * @Route("/", name="home")
      */
     public function index()
     {
-        $galleries = $this->getDoctrine()->getRepository(Gallery::class)->findBy([], ['createdAt' => 'DESC'], self::PER_PAGE);
+        $galleries = $this->em->getRepository(Gallery::class)->findBy([], ['createdAt' => 'DESC'], self::PER_PAGE);
 
         return $this->render('home.html.twig', [
             'galleries' => $galleries,

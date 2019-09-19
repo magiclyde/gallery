@@ -4,18 +4,23 @@ namespace App\Controller;
 
 use App\Entity\Gallery;
 use App\Service\UserManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class GalleryController extends AbstractController
 {   
+    /** @var EntityManagerInterface */
+    private $em;
 
 	/** @var  UserManager */
     private $userManager;
 
-	public function __construct(UserManager $userManager)
+	public function __construct(EntityManagerInterface $em,
+        UserManager $userManager)
     {
+        $this->em = $em;
         $this->userManager = $userManager;
     }
 
@@ -24,7 +29,7 @@ class GalleryController extends AbstractController
      */
     public function index($id)
     {
-        $gallery = $this->getDoctrine()->getRepository(Gallery::class)->find($id);
+        $gallery = $this->em->getRepository(Gallery::class)->find($id);
         if (empty($gallery)) {
             throw new NotFoundHttpException();
         }

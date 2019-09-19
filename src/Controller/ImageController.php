@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Image;
 use App\Service\ImageResizer;
 use App\Service\FileManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -13,6 +14,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ImageController extends AbstractController
 {
+    /** @var EntityManagerInterface */
+    private $em;
+
     /** @var  FileManager */
     private $fileManager;
 
@@ -20,10 +24,12 @@ class ImageController extends AbstractController
     private $imageResizer;
 
     public function __construct(
+        EntityManagerInterface $em,
         FileManager $fileManager, 
         ImageResizer $imageResizer
     )
     {
+        $this->em = $em;
         $this->fileManager = $fileManager;
         $this->imageResizer = $imageResizer;
     }
@@ -41,7 +47,7 @@ class ImageController extends AbstractController
             throw new NotFoundHttpException('Image not found');
         }
 
-        $image = $this->getDoctrine()->getRepository(Image::class)->find($id);
+        $image = $this->em->getRepository(Image::class)->find($id);
 
         if (empty($image)) {
             throw new NotFoundHttpException('Image not found');
