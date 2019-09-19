@@ -6,14 +6,40 @@ use App\Entity\Image;
 use App\Service\FileManager;
 use App\Service\ImageResizer;
 use App\Service\JobQueueFactory;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ResizeImageWorkerCommand extends ContainerAwareCommand
+class ResizeImageWorkerCommand extends Command
 {
     /** @var  OutputInterface */
     private $output;
+
+    /** @var  EntityManagerInterface */
+    private $em;
+
+    /** @var  JobQueueFactory */
+    private $jobQueueFactory;
+
+    /** @var  ImageResizer */
+    private $imageResizer;
+
+    /** @var  FileManager */
+    private $fileManager;
+
+    public function __construct(EntityManagerInterface $em,
+        JobQueueFactory $jobQueueFactory, 
+        ImageResizer $imageResizer,
+        FileManager $fileManager)
+    {
+        $this->em = $em;
+        $this->jobQueueFactory = $jobQueueFactory;
+        $this->imageResizer = $imageResizer;
+        $this->fileManager = $fileManager;
+
+        parent::__construct();
+    }
 
     protected function configure()
     {
@@ -25,8 +51,7 @@ class ResizeImageWorkerCommand extends ContainerAwareCommand
         $this->output = $output;
         $output->writeln(sprintf('Started worker'));
 
-        $queue = $this->getContainer()
-            ->get(JobQueueFactory::class)
+        $queue = $this->jobQueueFactory
             ->createQueue()
             ->watch(JobQueueFactory::QUEUE_IMAGE_RESIZE);
 
@@ -50,19 +75,13 @@ class ResizeImageWorkerCommand extends ContainerAwareCommand
     protected function resizeImage(string $imageId)
     {
         /** @var Image $image */
-        $image = $this->getContainer()->get('doctrine')
-            ->getManager()
-            ->getRepository(Image::class)
-            ->find($imageId);
+        $image = $this->em->getRepository(Image::class)->find($imageId);
 
         if (empty($image)) {
             $this->output->writeln("Image with ID $imageId not found");
         }
 
-        $imageResizer = $this->getContainer()->get(ImageResizer::class);
-        $fileManager = $this->getContainer()->get(FileManager::class);
-
-        $fullPath = $fileManager->getFilePath($image->getFilename());
+        $fullPath = $this->fileManager->getFilePath($image->getFilename());
         if (empty($fullPath)) {
             $this->output->writeln("Full path for image with ID $imageId is empty");
 
@@ -70,8 +89,8 @@ class ResizeImageWorkerCommand extends ContainerAwareCommand
         }
 
         $cachedPaths = [];
-        foreach ($imageResizer->getSupportedWidths() as $width) {
-            $cachedPaths[$width] = $imageResizer->getResizedPath($fullPath, $width, true);
+        foreach ($this->imageResizer->getSupportedWidths() as $width) {
+            $cachedPaths[$width] = $this->imageResizer->getResizedPath($fullPath, $width, true);
         }
 
         $this->output->writeln("Thumbnails generated for image $imageId");
