@@ -46,4 +46,36 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    Redis:
+        class: Predis\Client
+        arguments:
+            #$parameters: '%env(REDIS_URI)%'
+            $parameters:
+                scheme: 'tcp'
+                host: '%env(REDIS_HOST)%'
+                port: '%env(REDIS_PORT)%'
+
+            $options:
+                parameters:
+                    password: '%env(REDIS_PWD)%'
+                    database: 0
+
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+        arguments:
+            - '@Redis'
+            - { prefix: '%env(REDIS_PREFIX)%' }
     
+
+    TusPhp\Cache\RedisStore:
+        arguments:
+            $options:
+                host: '%env(REDIS_HOST)%'
+                port: '%env(REDIS_PORT)%'
+                password: '%env(REDIS_PWD)%'
+                database: 1
+
+    TusPhp\Tus\Server:
+        arguments:
+            - '@TusPhp\Cache\RedisStore'
+

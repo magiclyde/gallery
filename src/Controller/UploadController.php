@@ -65,11 +65,13 @@ class UploadController extends AbstractController
         $gallery->setUser($this->userManager->getCurrentUser());
         $files = $request->files->get('file');
 
+        $this->fileManager->setBaseUrl($request->getSchemeAndHttpHost());
+
         /** @var UploadedFile $file */
         foreach ($files as $file) {
             $filename = $file->getClientOriginalName();
             $filepath = Uuid::getFactory()->uuid4()->toString() . '.' . $file->getClientOriginalExtension();
-            $movedFile = $this->fileManager->upload($file, $filepath);
+            $this->fileManager->upload($file, $filepath);
 
             $image = new Image(
                 Uuid::getFactory()->uuid4(),
